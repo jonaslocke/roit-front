@@ -37,4 +37,7 @@ $heading-font-family: "Open Sans";
   }
   font-family: $body-font-family, sans-serif !important;
 }
+.cup {
+  cursor: pointer;
+}
 </style>
