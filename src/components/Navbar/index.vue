@@ -29,13 +29,13 @@
       ></v-text-field>
     </v-card>
     <lang-selection />
-    <avatar user="jonas antunes"/>
+    <user-menu user="jonas antunes"/>
   </v-app-bar>
 </template>
 
 <script>
-import Avatar from "./components/Avatar.vue";
 import LangSelection from "./components/LangSelection.vue";
+import UserMenu from "./components/UserMenu";
 export default {
   name: "Navbar",
   data: () => {
@@ -43,7 +43,7 @@ export default {
   },
   components: {
     LangSelection,
-    Avatar,
+    UserMenu,
   },
 };
 </script>
