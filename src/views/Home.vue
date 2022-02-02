@@ -4,6 +4,6 @@
 
 <script>
 export default {
-  name: "ROIT Bank",
+  name: "RoitBank",
 };
 </script>
