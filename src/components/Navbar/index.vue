@@ -1,7 +1,7 @@
 <template>
   <v-app-bar app color="secondary" dark>
     <div class="d-flex align-center">
-      <div class="top-badge">
+      <div class="top-badge" @click="setOpenDrawer(!open)">
         <v-btn class="mx-2" fab dark small color="#FFFFFF33">
           <img src="@/assets/images/menu.svg" />
         </v-btn>
@@ -29,21 +29,29 @@
       ></v-text-field>
     </v-card>
     <lang-selection />
-    <user-menu user="jonas antunes"/>
+    <user-menu user="jonas antunes" />
   </v-app-bar>
 </template>
 
 <script>
 import LangSelection from "./components/LangSelection.vue";
 import UserMenu from "./components/UserMenu";
+import { mapActions, mapGetters } from "vuex";
+
 export default {
+  components: {
+    LangSelection,
+    UserMenu,
+  },
   name: "Navbar",
   data: () => {
     return {};
   },
-  components: {
-    LangSelection,
-    UserMenu,
+  methods: {
+    ...mapActions(["setOpenDrawer"]),
+  },
+  computed: {
+    ...mapGetters({ open: "getOpenDrawer" }),
   },
 };
 </script>
