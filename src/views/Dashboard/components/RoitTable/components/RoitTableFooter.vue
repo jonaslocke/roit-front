@@ -14,7 +14,8 @@
       ></v-select>
     </v-card>
     <div class="caption ml-4 grey--text">
-      Exibindo {{ showing.first }} - {{ showing.last }} de {{ 23 }} Registros
+      Exibindo {{ showing.first }} - {{ showing.last }} de
+      {{ totalUsers }} Registros
     </div>
     <v-spacer></v-spacer>
     <v-btn icon @click="previousPage()">
@@ -42,6 +43,7 @@ export default {
       currentPage: "getCurrentPage",
       pageSize: "getPageSize",
       pageCount: "getPageCount",
+      totalUsers: "getTotalUsers",
     }),
     showing() {
       const first = this.currentPage * this.pageSize + 1;

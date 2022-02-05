@@ -43,13 +43,12 @@ require("dotenv").config();
 export default {
   components: { RoitTableFooter },
   name: "RoitTable",
-  data: () => {
-    return {
-      users: [],
-    };
-  },
   computed: {
-    ...mapGetters({ currentPage: "getCurrentPage", pageSize: "getPageSize" }),
+    ...mapGetters({
+      currentPage: "getCurrentPage",
+      pageSize: "getPageSize",
+      users: "getUsers",
+    }),
     headers() {
       return ["_id", "name", "age", "git_hub", "fullAddress"].map((d) => {
         return { text: tableHeadersTranslation[d], value: d, filterable: true };
@@ -62,7 +61,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["setPageCount"]),
+    ...mapActions(["setUsers"]),
     async fetchUsers() {
       const api = `${process.env.VUE_APP_API}`;
       const response = await fetch(api);
@@ -72,14 +71,10 @@ export default {
     getFullAddress: ({ street, city, uf, others_cep }) =>
       `${street} - ${others_cep} - ${city}/${uf}`,
   },
-  watch: {
-    users() {
-      this.setPageCount(Math.ceil(this.users.length / this.pageSize));
-    },
-  },
 
   async mounted() {
-    this.users = await this.fetchUsers();
+    const users = await this.fetchUsers();
+    this.setUsers(users);
   },
 };
 </script>
