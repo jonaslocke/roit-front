@@ -55,5 +55,10 @@ $heading-font-family: "Open Sans";
   border-color: var(--border);
   text-transform: initial;
   letter-spacing: initial;
+  &.disabled {
+    filter: grayscale(1);
+    opacity: 0.7;
+    pointer-events: none;
+  }
 }
 </style>

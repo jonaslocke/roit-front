@@ -10,7 +10,7 @@
       </div>
       <v-card class="mt-5 py-5 px-4">
         <div class="d-flex">
-          <v-btn color="primary" class="roit-btn px-5"> Cadastrar </v-btn>
+          <add-user></add-user>
           <v-spacer></v-spacer>
           <v-card elevation="0" width="176">
             <v-text-field
@@ -32,8 +32,10 @@
 import { mapGetters } from "vuex";
 import Sidebar from "./components/Sidebar";
 import RoitTable from "./components/RoitTable";
+import AddUser from "./components/AddUser";
+
 export default {
-  components: { Sidebar, RoitTable },
+  components: { Sidebar, RoitTable, AddUser },
   name: "Dashboard",
   computed: {
     ...mapGetters({ open: "getOpenDrawer" }),
