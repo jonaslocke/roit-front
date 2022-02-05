@@ -37,7 +37,7 @@
 <script>
 import { tableHeadersTranslation } from "@/models";
 import { mapActions, mapGetters } from "vuex";
-import RoitTableFooter from "./components/RoitTableFooter.vue";
+import RoitTableFooter from "./components/RoitTableFooter";
 
 require("dotenv").config();
 export default {

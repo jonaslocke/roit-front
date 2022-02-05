@@ -7,7 +7,6 @@
         hide-details
         dense
         :menu-props="{ offsetY: true }"
-        v-model="values"
         class="caption"
         height="20"
         @change="onChange"
@@ -18,23 +17,40 @@
       {{ totalUsers }} Registros
     </div>
     <v-spacer></v-spacer>
-    <v-btn icon @click="previousPage()">
+    <roit-footer-selectors :callback="currentPage != 0 ? previousPage : null">
       <v-icon>mdi-chevron-left</v-icon>
-    </v-btn>
-    <v-btn icon @click="nextPage()">
+    </roit-footer-selectors>
+    <div class="multiple-selectors d-flex" v-if="pageCount > 1">
+      <div
+        @click="setCurrentPage(page - 1)"
+        v-for="page in pageCount"
+        :key="page"
+      >
+        <roit-footer-selectors
+          color="#ffffff"
+          :active="page === currentPage + 1"
+        >
+          {{ page }}
+        </roit-footer-selectors>
+      </div>
+    </div>
+    <roit-footer-selectors
+      :callback="currentPage < pageCount - 1 ? nextPage : null"
+    >
       <v-icon>mdi-chevron-right</v-icon>
-    </v-btn>
-    {{ currentPage }}
+    </roit-footer-selectors>
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import RoitFooterSelectors from "./components/RoitFooterSelectors.vue";
+
 export default {
+  components: { RoitFooterSelectors },
   name: "RoitTableFooter",
   data: () => {
     return {
-      values: "",
       items: [5, 10, 15, 20],
     };
   },
@@ -66,7 +82,6 @@ export default {
       }
     },
     onChange(value) {
-      console.log(value);
       this.setPageSize(value);
     },
   },
