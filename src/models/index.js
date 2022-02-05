@@ -3,4 +3,11 @@ const languages = [
   { forLetterCode: "pt_BR", languageString: "Portugês" },
   { forLetterCode: "es_ES", languageString: "Español" },
 ];
-export { languages };
+const tableHeadersTranslation = {
+  _id: "ID",
+  name: "Nome",
+  age: "Idade",
+  git_hub: "GitHub User",
+  fullAddress: "Endereço",
+};
+export { languages, tableHeadersTranslation };
