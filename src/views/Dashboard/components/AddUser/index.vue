@@ -69,10 +69,14 @@
                   outlined
                   dense
                   class="caption"
+                  :class="{ 'valid-check': gitIsValid }"
                   hide-details
                   v-model="userData.git"
                   :rules="rules.required"
                   @change="checkGit"
+                  :loading="loading.git"
+                  :disabled="loading.git"
+                  :append-icon="gitIsValid ? 'mdi-check-circle' : null"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -213,6 +217,7 @@ export default {
       cities: ["Salvador", "São Paulo"],
       neighbourhoods: ["Pituaçu", "Higiénopolis"],
       cepIsValid: false,
+      gitIsValid: false,
       userData: {
         id: "",
         name: "",
@@ -261,7 +266,20 @@ export default {
       }
     },
     async checkGit(user) {
-      console.log("checkGit", user);
+      this.loading.git = true;
+      const api = `https://api.github.com/users/${user}`;
+
+      const response = await fetch(api);
+      const { status } = response;
+
+      if (status === 200) {
+        const data = await response.json();
+        console.log(response, data);
+        this.loading.git = false;
+        this.gitIsValid = true;
+      } else {
+        console.error("not found");
+      }
     },
   },
   watch: {
@@ -284,5 +302,9 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+.valid-check {
+  color: #4caf50 !important;
+  caret-color: #4caf50 !important;
+}
 </style>
