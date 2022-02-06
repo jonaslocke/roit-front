@@ -387,7 +387,13 @@ export default {
         const fetchRepos = await fetch(`${api}/repos`);
         if (fetchRepos.status === 200) {
           const fetchReposData = await fetchRepos.json();
-          const repos = JSON.stringify(fetchReposData);
+
+          const repos = JSON.stringify(
+            fetchReposData.length > 15
+              ? fetchReposData.slice(0, 14)
+              : fetchReposData
+          );
+
           this.userData.update({ repos });
         }
 

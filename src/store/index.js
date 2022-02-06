@@ -15,6 +15,7 @@ export default new Vuex.Store({
     handleUserOpen: false,
     selectedUser: {},
     snackbar: {},
+    search: "",
   },
   mutations: {
     setOpenDrawer: (state, payload) => (state.openDrawer = payload),
@@ -24,6 +25,7 @@ export default new Vuex.Store({
     setHandleUserOpen: (state, payload) => (state.handleUserOpen = payload),
     setSelectedUser: (state, payload) => (state.selectedUser = payload),
     setSnackbar: (state, payload) => (state.snackbar = new Snackbar(payload)),
+    setSearch: (state, payload) => (state.search = payload),
   },
   actions: {
     setOpenDrawer: ({ commit }, payload) => commit("setOpenDrawer", payload),
@@ -38,11 +40,10 @@ export default new Vuex.Store({
     },
     setHandleUserOpen: ({ commit }, payload) =>
       commit("setHandleUserOpen", payload),
-
     setSelectedUser: ({ commit }, payload) =>
       commit("setSelectedUser", payload),
-
     setSnackbar: ({ commit }, payload) => commit("setSnackbar", payload),
+    setSearch: ({ commit }, payload) => commit("setSearch", payload),
   },
   getters: {
     getOpenDrawer: (state) => state.openDrawer,
@@ -55,6 +56,7 @@ export default new Vuex.Store({
     getSelectedUser: (state) => state.selectedUser,
     hasSelectedUser: (state) => Object.keys(state.selectedUser).length > 0,
     getSnackbar: (state) => state.snackbar,
+    getSearch: (state) => state.search,
   },
   modules: {},
 });

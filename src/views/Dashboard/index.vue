@@ -19,6 +19,7 @@
               label="Busca"
               prepend-inner-icon="mdi-magnify"
               hide-details
+              @input="handleSearch"
             ></v-text-field>
           </v-card>
         </div>
@@ -29,7 +30,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import Sidebar from "./components/Sidebar";
 import RoitTable from "./components/RoitTable";
 import HandleUser from "./components/HandleUser";
@@ -41,6 +42,12 @@ export default {
     ...mapGetters({ open: "getOpenDrawer" }),
     displacement() {
       return this.open ? 84 : 0;
+    },
+  },
+  methods: {
+    ...mapActions(["setSearch"]),
+    handleSearch(data) {
+      this.setSearch(data);
     },
   },
 };

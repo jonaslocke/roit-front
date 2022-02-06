@@ -8,6 +8,7 @@
       hide-default-footer
       :loading="loading"
       disable-pagination
+      :search="search"
     >
       <template #header="{ props }">
         <thead class="v-data-table-header">
@@ -104,6 +105,7 @@ export default {
       currentPage: "getCurrentPage",
       pageSize: "getPageSize",
       users: "getUsers",
+      search: "getSearch",
     }),
     headers() {
       return ["_id", "name", "age", "html_url", "fullAddress", "actions"].map(
