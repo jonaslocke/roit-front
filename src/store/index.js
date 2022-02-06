@@ -11,6 +11,7 @@ export default new Vuex.Store({
     pageCount: null,
     users: [],
     handleUserOpen: false,
+    selectedUser: {},
   },
   mutations: {
     setOpenDrawer: (state, payload) => (state.openDrawer = payload),
@@ -18,6 +19,7 @@ export default new Vuex.Store({
     setPageSize: (state, payload) => (state.pageSize = payload),
     setUsers: (state, payload) => (state.users = payload),
     setHandleUserOpen: (state, payload) => (state.handleUserOpen = payload),
+    setSelectedUser: (state, payload) => (state.selectedUser = payload),
   },
   actions: {
     setOpenDrawer: ({ commit }, payload) => commit("setOpenDrawer", payload),
@@ -32,6 +34,9 @@ export default new Vuex.Store({
     },
     setHandleUserOpen: ({ commit }, payload) =>
       commit("setHandleUserOpen", payload),
+
+    setSelectedUser: ({ commit }, payload) =>
+      commit("setSelectedUser", payload),
   },
   getters: {
     getOpenDrawer: (state) => state.openDrawer,
@@ -41,6 +46,8 @@ export default new Vuex.Store({
     getUsers: (state) => state.users,
     getTotalUsers: (state) => state.users.length,
     getHandleUserOpen: (state) => state.handleUserOpen,
+    getSelectedUser: (state) => state.selectedUser,
+    hasSelectedUser: (state) => Object.keys(state.selectedUser).length > 0,
   },
   modules: {},
 });

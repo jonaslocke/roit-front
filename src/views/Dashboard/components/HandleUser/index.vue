@@ -12,7 +12,8 @@
         <v-card-title class="pt-5 pb-0">
           <div class="flex-1">
             <div class="poppins d-flex justify-space-between pb-3">
-              <span>Adicionar</span>
+              <span v-if="hasUser">Editar</span>
+              <span v-else>Adicionar</span>
               <v-btn icon small @click="setHandleUserOpen(!open)">
                 <v-icon small>mdi-close</v-icon>
               </v-btn>
@@ -22,7 +23,7 @@
         </v-card-title>
         <v-card-text class="mt-4">
           <v-form
-            @submit.prevent="addUser()"
+            @submit.prevent="hasUser ? updateUser() : addUser()"
             class="container-fluid"
             v-model="valid"
           >
@@ -218,7 +219,7 @@
               primary
               cup
             "
-            :class="{ disabled: !valid || loading.add }"
+            :class="{ disabled: !valid || loading.add || loading.update }"
           >
             <span>Salvar</span>
             <v-progress-circular
@@ -226,7 +227,7 @@
               color="white"
               size="16"
               class="ml-2"
-              v-if="loading.add"
+              v-if="loading.add || loading.update"
             ></v-progress-circular>
           </label>
         </v-card-actions>
@@ -242,11 +243,6 @@ import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "HandleUser",
-  props: {
-    user: {
-      type: Object,
-    },
-  },
   data: () => {
     return {
       valid: false,
@@ -265,11 +261,25 @@ export default {
         git: false,
         cep: false,
         add: false,
+        update: false,
       },
     };
   },
+  computed: {
+    ...mapGetters({
+      open: "getHandleUserOpen",
+      hasUser: "hasSelectedUser",
+      selectedUser: "getSelectedUser",
+      users: "getUsers",
+    }),
+  },
   methods: {
-    ...mapActions(["fetchUsers", "setHandleUserOpen"]),
+    ...mapActions([
+      "fetchUsers",
+      "setHandleUserOpen",
+      "setSelectedUser",
+      "setUsers",
+    ]),
     async addUser() {
       this.loading.add = true;
       const api = `${process.env.VUE_APP_API}`;
@@ -283,6 +293,27 @@ export default {
       });
       this.refreshData();
       this.loading.add = false;
+    },
+    async updateUser() {
+      this.loading.update = true;
+      const id = this.selectedUser._id;
+      const api = `${process.env.VUE_APP_API}/${id}`;
+      const body = { ...this.userData };
+      delete body.id;
+      const response = await fetch(api, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+        headers: { "Content-type": "application/json; charset=UTF-8" },
+      });
+      if (response.status === 200) {
+        const data = await response.json();
+        this.setUsers(
+          this.users.map((user) => (user._id === data._id ? data : user))
+        );
+      }
+
+      this.setHandleUserOpen(false);
+      this.loading.update = false;
     },
     async fetchCep(cep) {
       if (cep.match(/\d{8}/)) {
@@ -345,7 +376,6 @@ export default {
         this.gitIsValid = true;
       } else {
         console.error("not found");
-        console.log(data);
         this.invalidGit = true;
         this.loading.git = false;
       }
@@ -366,8 +396,22 @@ export default {
       }
     },
   },
-  computed: {
-    ...mapGetters({ open: "getHandleUserOpen" }),
+
+  watch: {
+    hasUser(val) {
+      if (val) {
+        const id = this.selectedUser._id;
+        this.userData = new UserData({ id });
+        this.userData.update(this.selectedUser);
+        this.cepIsValid = true;
+        this.gitIsValid = true;
+      }
+    },
+    open(val, oldVal) {
+      if (oldVal && !val) {
+        this.setSelectedUser({});
+      }
+    },
   },
 };
 </script>

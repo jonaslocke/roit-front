@@ -49,6 +49,7 @@
                 icon
                 class="actions__detail"
                 small
+                @click="handleDetail(item)"
               >
                 <v-icon small>mdi-eye</v-icon>
               </v-btn>
@@ -122,7 +123,12 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["setUsers", "fetchUsers"]),
+    ...mapActions([
+      "setUsers",
+      "fetchUsers",
+      "setSelectedUser",
+      "setHandleUserOpen",
+    ]),
 
     getFullAddress: ({ logradouro, localidade, uf, bairro, numero }) =>
       `${logradouro}, ${numero} - ${bairro} - ${localidade}/${uf}`,
@@ -130,6 +136,10 @@ export default {
     handleDelete({ _id }) {
       this.selected = _id;
       this.dialog.delete = true;
+    },
+    handleDetail(item) {
+      this.setSelectedUser(item);
+      this.setHandleUserOpen(true);
     },
   },
 
