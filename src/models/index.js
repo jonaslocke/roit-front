@@ -7,7 +7,7 @@ const tableHeadersTranslation = {
   _id: "ID",
   name: "Nome",
   age: "Idade",
-  git_hub: "GitHub User",
+  html_url: "GitHub User",
   fullAddress: "Endereço",
 };
 

@@ -29,6 +29,12 @@
           </tr>
         </thead>
       </template>
+      <template #[`item.html_url`]="{ value }">
+        <span v-if="value">
+          <a :href="value" target="_blank">{{ value }}</a>
+          <v-icon x-small class="ml-2" color="primary">mdi-link</v-icon>
+        </span>
+      </template>
       <template #[`item.fullAddress`]="{ item }">
         {{ getFullAddress(item) }}
       </template>
@@ -99,7 +105,7 @@ export default {
       users: "getUsers",
     }),
     headers() {
-      return ["_id", "name", "age", "git_hub", "fullAddress", "actions"].map(
+      return ["_id", "name", "age", "html_url", "fullAddress", "actions"].map(
         (d) => {
           return {
             text: tableHeadersTranslation[d],
@@ -118,8 +124,8 @@ export default {
   methods: {
     ...mapActions(["setUsers", "fetchUsers"]),
 
-    getFullAddress: ({ street, city, uf, others_cep }) =>
-      `${street} - ${others_cep} - ${city}/${uf}`,
+    getFullAddress: ({ logradouro, localidade, uf, bairro, numero }) =>
+      `${logradouro}, ${numero} - ${bairro} - ${localidade}/${uf}`,
 
     handleDelete({ _id }) {
       this.selected = _id;
@@ -166,10 +172,27 @@ export default {
       }
     }
     tr {
+      --size: 4px;
+      position: relative;
       &:hover {
         .actions {
           opacity: 1;
         }
+        &::before {
+          width: var(--size);
+        }
+      }
+      &::before {
+        content: "";
+        background-color: var(--primary);
+        width: 0;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-top-right-radius: 3px;
+        border-bottom-right-radius: 3px;
+        transition: 0.2s ease-in;
       }
     }
   }
