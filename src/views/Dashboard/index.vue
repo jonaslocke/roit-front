@@ -10,7 +10,7 @@
       </div>
       <v-card class="mt-5 py-5 px-4">
         <div class="d-flex">
-          <add-user></add-user>
+          <handle-user></handle-user>
           <v-spacer></v-spacer>
           <v-card elevation="0" width="176">
             <v-text-field
@@ -32,10 +32,10 @@
 import { mapGetters } from "vuex";
 import Sidebar from "./components/Sidebar";
 import RoitTable from "./components/RoitTable";
-import AddUser from "./components/AddUser";
+import HandleUser from "./components/HandleUser";
 
 export default {
-  components: { Sidebar, RoitTable, AddUser },
+  components: { Sidebar, RoitTable, HandleUser },
   name: "Dashboard",
   computed: {
     ...mapGetters({ open: "getOpenDrawer" }),

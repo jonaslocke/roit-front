@@ -10,12 +10,14 @@ export default new Vuex.Store({
     pageSize: 5,
     pageCount: null,
     users: [],
+    handleUserOpen: false,
   },
   mutations: {
     setOpenDrawer: (state, payload) => (state.openDrawer = payload),
     setCurrentPage: (state, payload) => (state.currentPage = payload),
     setPageSize: (state, payload) => (state.pageSize = payload),
     setUsers: (state, payload) => (state.users = payload),
+    setHandleUserOpen: (state, payload) => (state.handleUserOpen = payload),
   },
   actions: {
     setOpenDrawer: ({ commit }, payload) => commit("setOpenDrawer", payload),
@@ -28,6 +30,8 @@ export default new Vuex.Store({
       const data = await response.json();
       commit("setUsers", data);
     },
+    setHandleUserOpen: ({ commit }, payload) =>
+      commit("setHandleUserOpen", payload),
   },
   getters: {
     getOpenDrawer: (state) => state.openDrawer,
@@ -36,6 +40,7 @@ export default new Vuex.Store({
     getPageCount: (state) => Math.ceil(state.users.length / state.pageSize),
     getUsers: (state) => state.users,
     getTotalUsers: (state) => state.users.length,
+    getHandleUserOpen: (state) => state.handleUserOpen,
   },
   modules: {},
 });

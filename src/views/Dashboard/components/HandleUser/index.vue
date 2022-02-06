@@ -1,15 +1,19 @@
 <template>
   <div class="add-user">
-    <v-btn color="primary" class="roit-btn px-5" @click="dialog = !dialog">
+    <v-btn
+      color="primary"
+      class="roit-btn px-5"
+      @click="setHandleUserOpen(true)"
+    >
       Cadastrar
     </v-btn>
-    <v-dialog :value="dialog" persistent max-width="680">
+    <v-dialog :value="open" persistent max-width="680">
       <v-card>
         <v-card-title class="pt-5 pb-0">
           <div class="flex-1">
             <div class="poppins d-flex justify-space-between pb-3">
               <span>Adicionar</span>
-              <v-btn icon small @click="dialog = !dialog">
+              <v-btn icon small @click="setHandleUserOpen(!open)">
                 <v-icon small>mdi-close</v-icon>
               </v-btn>
             </div>
@@ -25,11 +29,11 @@
             <v-row>
               <v-col cols="4">
                 <v-text-field
+                  hide-details
                   label="ID"
                   placeholder="Digite um ID"
                   outlined
                   dense
-                  hide-details
                   class="caption"
                   v-model="userData.id"
                   disabled
@@ -37,11 +41,11 @@
               </v-col>
               <v-col cols="8">
                 <v-text-field
+                  hide-details
                   label="Nome"
                   placeholder="Digite um nome"
                   outlined
                   dense
-                  hide-details
                   class="caption"
                   v-model="userData.name"
                   :rules="rules.required"
@@ -51,12 +55,12 @@
             <v-row>
               <v-col cols="4">
                 <v-text-field
+                  hide-details
                   label="Idade"
                   placeholder="0"
                   outlined
                   dense
                   class="caption"
-                  hide-details
                   type="number"
                   v-model="userData.age"
                   :rules="rules.required"
@@ -64,45 +68,56 @@
               </v-col>
               <v-col cols="8">
                 <v-text-field
+                  hide-details
                   label="GitHub User"
                   placeholder="Usuário do GitHub"
                   outlined
                   dense
                   class="caption"
                   :class="{ 'valid-check': gitIsValid }"
-                  hide-details
                   v-model="userData.login"
-                  @change="checkGit"
+                  @change="fetchGit"
                   :loading="loading.git"
                   :disabled="loading.git"
-                  :append-icon="gitIsValid ? 'mdi-check-circle' : null"
+                  :append-icon="
+                    gitIsValid
+                      ? 'mdi-check-circle'
+                      : !!invalidGit
+                      ? 'mdi-close-circle'
+                      : null
+                  "
                   :rules="rules.required"
+                  :error="!!invalidGit"
+                  :success="gitIsValid"
                 ></v-text-field>
               </v-col>
             </v-row>
             <v-row>
               <v-col cols="2">
                 <v-text-field
+                  hide-details
                   label="CEP"
                   placeholder="00.000-00"
                   outlined
                   dense
                   class="cep caption"
-                  @input="checkCep"
+                  @input="fetchCep"
                   v-model="userData.cep"
                   :disabled="loading.cep"
                   :loading="loading.cep"
                   :rules="rules.required"
+                  :success="cepIsValid"
+                  :error="invalidCep"
                 ></v-text-field>
               </v-col>
               <v-col cols="2">
                 <v-select
+                  hide-details
                   :items="states"
                   label="Estado"
                   outlined
                   dense
                   class="caption"
-                  hide-details
                   :menu-props="{ offsetY: true }"
                   :disabled="!cepIsValid"
                   v-model="userData.uf"
@@ -111,12 +126,12 @@
               </v-col>
               <v-col cols="4">
                 <v-select
+                  hide-details
                   :items="cities"
                   label="Cidade"
                   outlined
                   dense
                   class="caption"
-                  hide-details
                   :menu-props="{ offsetY: true }"
                   :disabled="!cepIsValid"
                   v-model="userData.localidade"
@@ -125,12 +140,12 @@
               </v-col>
               <v-col cols="4">
                 <v-select
+                  hide-details
                   :items="neighbourhoods"
                   label="Bairro"
                   outlined
                   dense
                   class="caption"
-                  hide-details
                   :menu-props="{ offsetY: true }"
                   :disabled="!cepIsValid"
                   v-model="userData.bairro"
@@ -141,12 +156,12 @@
             <v-row>
               <v-col cols="5">
                 <v-text-field
+                  hide-details
                   label="Rua"
                   placeholder="Jardinete Juventina"
                   outlined
                   dense
                   class="caption"
-                  hide-details
                   :disabled="!cepIsValid"
                   v-model="userData.logradouro"
                   :rules="rules.required"
@@ -154,12 +169,12 @@
               </v-col>
               <v-col cols="2">
                 <v-text-field
+                  hide-details
                   label="Número"
                   placeholder="---"
                   outlined
                   dense
                   class="caption"
-                  hide-details
                   :disabled="!cepIsValid"
                   v-model="userData.numero"
                   :rules="rules.required"
@@ -167,12 +182,12 @@
               </v-col>
               <v-col cols="5">
                 <v-text-field
+                  hide-details
                   label="Complemento"
                   placeholder="Ex. Casa 01, Ap 20 / Bl 01..."
                   outlined
                   dense
                   class="caption"
-                  hide-details
                   :disabled="!cepIsValid"
                   v-model="userData.complemento"
                 ></v-text-field>
@@ -223,19 +238,25 @@
 <script>
 import UserData from "@/models/UserData";
 import { v4 as uuidv4 } from "uuid";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
-  name: "AddUser",
+  name: "HandleUser",
+  props: {
+    user: {
+      type: Object,
+    },
+  },
   data: () => {
     return {
-      dialog: false,
       valid: false,
       states: ["BA", "SP"],
       cities: ["Salvador", "São Paulo"],
       neighbourhoods: ["Pituaçu", "Higiénopolis"],
       cepIsValid: false,
       gitIsValid: false,
+      invalidGit: false,
+      invalidCep: false,
       userData: new UserData({ id: uuidv4() }),
       rules: {
         required: [(v) => !!v || "Campo requerido"],
@@ -248,7 +269,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["fetchUsers"]),
+    ...mapActions(["fetchUsers", "setHandleUserOpen"]),
     async addUser() {
       this.loading.add = true;
       const api = `${process.env.VUE_APP_API}`;
@@ -263,8 +284,9 @@ export default {
       this.refreshData();
       this.loading.add = false;
     },
-    async checkCep(cep) {
+    async fetchCep(cep) {
       if (cep.match(/\d{8}/)) {
+        this.invalidCep = false;
         this.loading.cep = true;
         const api = `https://viacep.com.br/ws/${cep}/json/`;
         const response = await fetch(api);
@@ -273,6 +295,7 @@ export default {
         if (erro) {
           console.error(erro);
           this.loading.cep = false;
+          this.invalidCep = true;
         } else {
           this.cepIsValid = true;
           const { logradouro, cep, localidade, uf, ibge, bairro } = json;
@@ -289,15 +312,16 @@ export default {
         }
       }
     },
-    async checkGit(user) {
+    async fetchGit(user) {
       this.loading.git = true;
+      this.invalidGit = false;
       const api = `https://api.github.com/users/${user}`;
 
       const response = await fetch(api);
+      const data = await response.json();
       const { status } = response;
 
       if (status === 200) {
-        const data = await response.json();
         const { login, avatar_url, html_url, name } = data;
         const gitId = data.id.toString();
 
@@ -321,15 +345,21 @@ export default {
         this.gitIsValid = true;
       } else {
         console.error("not found");
+        console.log(data);
+        this.invalidGit = true;
+        this.loading.git = false;
       }
     },
     refreshData(fetch = true) {
       this.userData.clear();
 
-      this.dialog = false;
+      this.setHandleUserOpen(false);
       this.valid = false;
       this.cepIsValid = false;
       this.gitIsValid = false;
+      for (let load in this.loading) {
+        this.loading[load] = false;
+      }
 
       if (fetch) {
         this.fetchUsers();
@@ -337,11 +367,7 @@ export default {
     },
   },
   computed: {
-    formIsValid() {
-      return Object.entries(this.userData).filter((key, value) => {
-        return { key, value };
-      });
-    },
+    ...mapGetters({ open: "getHandleUserOpen" }),
   },
 };
 </script>

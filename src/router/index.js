@@ -12,11 +12,6 @@ const routes = [
         /* webpackChunkName: "dashboard" */ "../views/Dashboard/index.vue"
       ),
   },
-  // {
-  //   path: '/about',
-  //   name: 'About',
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  // }
 ];
 
 const router = new VueRouter({
