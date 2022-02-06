@@ -76,7 +76,7 @@ export default {
     ...mapGetters({ users: "getUsers" }),
   },
   methods: {
-    ...mapActions(["setUsers"]),
+    ...mapActions(["setUsers", "setSnackbar"]),
     closeDialog() {
       this.$emit("update:open", false);
     },
@@ -90,6 +90,15 @@ export default {
         this.setUsers(this.users.filter(({ _id }) => _id != this.selected));
         this.closeDialog();
       }
+
+      this.setSnackbar({
+        open: true,
+        text:
+          response.status === 200
+            ? "Usuário deletado com sucesso"
+            : "Houve um erro ao deletar o usuário, tente novamente",
+        color: response.status === 200 ? "grey" : "error",
+      });
 
       this.loading = false;
     },

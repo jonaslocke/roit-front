@@ -279,6 +279,7 @@ export default {
       "setHandleUserOpen",
       "setSelectedUser",
       "setUsers",
+      "setSnackbar",
     ]),
     async addUser() {
       this.loading.add = true;
@@ -286,13 +287,22 @@ export default {
       const body = { ...this.userData };
       delete body.id;
 
-      await fetch(api, {
+      const response = await fetch(api, {
         method: "POST",
         body: JSON.stringify(body),
         headers: { "Content-type": "application/json; charset=UTF-8" },
       });
+
       this.refreshData();
       this.loading.add = false;
+      this.setSnackbar({
+        open: true,
+        text:
+          response.status === 201
+            ? "Usuário criado com sucesso"
+            : "Houve um erro ao criar o usuário, tente novamente",
+        color: response.status === 201 ? "grey" : "error",
+      });
     },
     async updateUser() {
       this.loading.update = true;
@@ -311,6 +321,15 @@ export default {
           this.users.map((user) => (user._id === data._id ? data : user))
         );
       }
+
+      this.setSnackbar({
+        open: true,
+        text:
+          response.status === 200
+            ? "Usuário Atualizado com Sucesso"
+            : "Houve um erro ao atualizar o usuário, tente novamente",
+        color: response.status === 200 ? "grey" : "error",
+      });
 
       this.setHandleUserOpen(false);
       this.loading.update = false;
