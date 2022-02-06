@@ -21,8 +21,10 @@
               v-for="(head, id) in props.headers"
               :key="id"
             >
-              <span>{{ head.text }}</span>
-              <v-icon small class="ml-1">mdi-filter-outline</v-icon>
+              <span v-if="head.value != 'actions'">
+                <span>{{ head.text }}</span>
+                <v-icon small class="ml-1">mdi-filter-outline</v-icon>
+              </span>
             </th>
           </tr>
         </thead>
@@ -31,8 +33,43 @@
         {{ getFullAddress(item) }}
       </template>
       <template #[`item.age`]="{ value }"> {{ value }} anos </template>
+      <template #[`item.actions`]="{ item }">
+        <div class="actions d-flex justify-end">
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-bind="attrs"
+                v-on="on"
+                icon
+                class="actions__detail"
+                small
+              >
+                <v-icon small>mdi-eye</v-icon>
+              </v-btn>
+            </template>
+            <span>Visualizar detalhe</span>
+          </v-tooltip>
+
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-bind="attrs"
+                v-on="on"
+                icon
+                class="actions__delete"
+                small
+                @click="handleDelete(item)"
+              >
+                <v-icon small>mdi-delete</v-icon>
+              </v-btn>
+            </template>
+            <span>Deletar</span>
+          </v-tooltip>
+        </div>
+      </template>
     </v-data-table>
     <roit-table-footer />
+    <delete-user :open.sync="dialog.delete" :selected="selected" />
   </v-card>
 </template>
 
@@ -40,14 +77,19 @@
 import { tableHeadersTranslation } from "@/models";
 import { mapActions, mapGetters } from "vuex";
 import RoitTableFooter from "./components/RoitTableFooter";
+import DeleteUser from "./components/DeleteUser.vue";
 
 require("dotenv").config();
 export default {
-  components: { RoitTableFooter },
+  components: { RoitTableFooter, DeleteUser },
   name: "RoitTable",
   data: () => {
     return {
       loading: true,
+      selected: null,
+      dialog: {
+        delete: false,
+      },
     };
   },
   computed: {
@@ -57,9 +99,15 @@ export default {
       users: "getUsers",
     }),
     headers() {
-      return ["_id", "name", "age", "git_hub", "fullAddress"].map((d) => {
-        return { text: tableHeadersTranslation[d], value: d, filterable: true };
-      });
+      return ["_id", "name", "age", "git_hub", "fullAddress", "actions"].map(
+        (d) => {
+          return {
+            text: tableHeadersTranslation[d],
+            value: d,
+            filterable: true,
+          };
+        }
+      );
     },
     filterdUsers() {
       const start = this.currentPage * this.pageSize;
@@ -72,6 +120,11 @@ export default {
 
     getFullAddress: ({ street, city, uf, others_cep }) =>
       `${street} - ${others_cep} - ${city}/${uf}`,
+
+    handleDelete({ _id }) {
+      this.selected = _id;
+      this.dialog.delete = true;
+    },
   },
 
   async mounted() {
@@ -96,6 +149,27 @@ export default {
     tbody {
       td {
         font-size: 13px !important;
+      }
+    }
+    .actions {
+      opacity: 0;
+      transition: 0.12s ease-in-out;
+      &__delete {
+        &:hover {
+          color: var(--error);
+        }
+      }
+      &__detail {
+        &:hover {
+          color: var(--secondary);
+        }
+      }
+    }
+    tr {
+      &:hover {
+        .actions {
+          opacity: 1;
+        }
       }
     }
   }
