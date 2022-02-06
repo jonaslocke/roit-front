@@ -71,12 +71,12 @@
                   class="caption"
                   :class="{ 'valid-check': gitIsValid }"
                   hide-details
-                  v-model="userData.git"
-                  :rules="rules.required"
+                  v-model="userData.login"
                   @change="checkGit"
                   :loading="loading.git"
                   :disabled="loading.git"
                   :append-icon="gitIsValid ? 'mdi-check-circle' : null"
+                  :rules="rules.required"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -90,9 +90,9 @@
                   class="cep caption"
                   @input="checkCep"
                   v-model="userData.cep"
-                  :rules="rules.cepRules"
                   :disabled="loading.cep"
                   :loading="loading.cep"
+                  :rules="rules.required"
                 ></v-text-field>
               </v-col>
               <v-col cols="2">
@@ -161,7 +161,7 @@
                   class="caption"
                   hide-details
                   :disabled="!cepIsValid"
-                  v-model="userData.number"
+                  v-model="userData.numero"
                   :rules="rules.required"
                 ></v-text-field>
               </v-col>
@@ -175,7 +175,6 @@
                   hide-details
                   :disabled="!cepIsValid"
                   v-model="userData.complemento"
-                  :rules="rules.required"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -206,9 +205,11 @@
 </template>
 
 <script>
+import UserData from "@/models/UserData";
+import { v4 as uuidv4 } from "uuid";
+
 export default {
   name: "AddUser",
-
   data: () => {
     return {
       dialog: true,
@@ -218,36 +219,50 @@ export default {
       neighbourhoods: ["Pituaçu", "Higiénopolis"],
       cepIsValid: false,
       gitIsValid: false,
-      userData: {
-        id: "",
-        name: "",
-        age: "",
-        git: "",
-        cep: "",
-        uf: "",
-        localidade: "",
-        bairro: "",
-        logradouro: "",
-        number: "",
-        complemento: "",
-      },
+      userData: new UserData({ id: uuidv4() }),
       rules: {
-        cepRules: [
-          (v) => !!v.match(/\d/) || "Apenas números",
-          (v) => v.length < 9 || "8 núm.",
-        ],
         required: [(v) => !!v || "Campo requerido"],
       },
       viaCepData: {},
+      gitData: {},
       loading: {
         git: false,
         cep: false,
+        add: false,
       },
     };
   },
   methods: {
-    addUser() {
-      console.log("submeteu");
+    async addUser() {
+      const api = `${process.env.VUE_APP_API}`;
+      const body = {
+        name: "antunes",
+        age: "37",
+
+        street: "barros pimentel",
+        cep: "41740-210",
+        city: "salvador",
+        uf: "bahia",
+        ibge_code: "00000",
+        others_cep: "",
+
+        git_hub: "https://github.com/jonaslocke",
+        login: "",
+        id: "11",
+        avatar: "",
+        repos: "",
+        others_git: "",
+      };
+      const create = await fetch(api, {
+        method: "POST",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "*",
+        },
+        body: JSON.stringify(body),
+      });
+
+      console.log(create);
     },
     async checkCep(cep) {
       if (cep.match(/\d{8}/)) {
@@ -257,10 +272,21 @@ export default {
         const json = await response.json();
         const { erro } = json;
         if (erro) {
-          console.log("erro");
+          console.error(erro);
+          this.loading.cep = false;
         } else {
           this.cepIsValid = true;
-          this.viaCepData = json;
+          const { logradouro, cep, localidade, uf, ibge, bairro } = json;
+          console.log(this, this.userData);
+          this.userData.update({
+            logradouro,
+            cep,
+            localidade,
+            uf,
+            ibge,
+            bairro,
+            outrosCep: json,
+          });
           this.loading.cep = false;
         }
       }
@@ -274,7 +300,24 @@ export default {
 
       if (status === 200) {
         const data = await response.json();
-        console.log(response, data);
+        const { login, avatar_url, html_url, name } = data;
+        const gitId = data.id;
+
+        this.userData.update({
+          login,
+          avatar_url,
+          html_url,
+          gitId,
+          name,
+          othersGit: data,
+        });
+
+        const fetchRepos = await fetch(`${api}/repos`);
+        if (fetchRepos.status === 200) {
+          const repos = await fetchRepos.json();
+          this.userData.update({ repos });
+        }
+
         this.loading.git = false;
         this.gitIsValid = true;
       } else {
@@ -282,29 +325,12 @@ export default {
       }
     },
   },
-  watch: {
-    cepIsValid(val, oldVal) {
-      if (!oldVal && val) {
-        const { bairro, complemento, localidade, logradouro, uf } =
-          this.viaCepData;
-
-        this.userData = {
-          ...this.userData,
-          bairro,
-          complemento,
-          localidade,
-          logradouro,
-          uf,
-        };
-      }
+  computed: {
+    formIsValid() {
+      return Object.entries(this.userData).filter((key, value) => {
+        return { key, value };
+      });
     },
   },
 };
 </script>
-
-<style lang="scss">
-.valid-check {
-  color: #4caf50 !important;
-  caret-color: #4caf50 !important;
-}
-</style>

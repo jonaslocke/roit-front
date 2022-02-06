@@ -10,4 +10,5 @@ const tableHeadersTranslation = {
   git_hub: "GitHub User",
   fullAddress: "Endereço",
 };
+
 export { languages, tableHeadersTranslation };
