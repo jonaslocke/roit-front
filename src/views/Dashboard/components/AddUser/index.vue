@@ -180,9 +180,18 @@
             </v-row>
             <input type="submit" hidden id="submit" />
           </v-form>
+          <v-divider class="mt-4"></v-divider>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            outlined
+            class="roit-btn px-5"
+            @click="refreshData(false)"
+          >
+            Cancelar
+          </v-btn>
           <label
             for="submit"
             class="
@@ -194,9 +203,16 @@
               primary
               cup
             "
-            :class="{ disabled: !valid }"
+            :class="{ disabled: !valid || loading.add }"
           >
-            Cadastrar
+            <span>Salvar</span>
+            <v-progress-circular
+              indeterminate
+              color="white"
+              size="16"
+              class="ml-2"
+              v-if="loading.add"
+            ></v-progress-circular>
           </label>
         </v-card-actions>
       </v-card>
@@ -207,6 +223,7 @@
 <script>
 import UserData from "@/models/UserData";
 import { v4 as uuidv4 } from "uuid";
+import { mapActions } from "vuex";
 
 export default {
   name: "AddUser",
@@ -223,8 +240,6 @@ export default {
       rules: {
         required: [(v) => !!v || "Campo requerido"],
       },
-      viaCepData: {},
-      gitData: {},
       loading: {
         git: false,
         cep: false,
@@ -233,7 +248,9 @@ export default {
     };
   },
   methods: {
+    ...mapActions(["fetchUsers"]),
     async addUser() {
+      this.loading.add = true;
       const api = `${process.env.VUE_APP_API}`;
       const body = { ...this.userData };
       delete body.id;
@@ -243,6 +260,8 @@ export default {
         body: JSON.stringify(body),
         headers: { "Content-type": "application/json; charset=UTF-8" },
       });
+      this.refreshData();
+      this.loading.add = false;
     },
     async checkCep(cep) {
       if (cep.match(/\d{8}/)) {
@@ -304,8 +323,17 @@ export default {
         console.error("not found");
       }
     },
-    refreshData() {
-      this.userData = new UserData({ id: uuidv4() });
+    refreshData(fetch = true) {
+      this.userData.clear();
+
+      this.dialog = false;
+      this.valid = false;
+      this.cepIsValid = false;
+      this.gitIsValid = false;
+
+      if (fetch) {
+        this.fetchUsers();
+      }
     },
   },
   computed: {

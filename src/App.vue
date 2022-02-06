@@ -60,5 +60,8 @@ $heading-font-family: "Open Sans";
     opacity: 0.7;
     pointer-events: none;
   }
+  &--no-border {
+    border-color: #e2b874 !important;
+  }
 }
 </style>

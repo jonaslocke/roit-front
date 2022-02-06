@@ -7,6 +7,7 @@
       hide-default-header
       hide-default-footer
       :loading="loading"
+      disable-pagination
     >
       <template #header="{ props }">
         <thead class="v-data-table-header">
