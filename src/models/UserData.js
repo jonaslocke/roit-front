@@ -41,6 +41,5 @@ export default class UserData {
 
   update(data) {
     Object.keys(data).forEach((key) => (this[key] = data[key]));
-    console.log(this);
   }
 }

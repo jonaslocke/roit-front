@@ -23,7 +23,7 @@ export default {
     },
     callback: {
       type: Function,
-      default: () => console.log("callback activated"),
+      default: () => console.warn("callback activated"),
     },
   },
   data: () => {

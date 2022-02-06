@@ -6,6 +6,7 @@
       class="table__data"
       hide-default-header
       hide-default-footer
+      :loading="loading"
     >
       <template #header="{ props }">
         <thead class="v-data-table-header">
@@ -43,6 +44,11 @@ require("dotenv").config();
 export default {
   components: { RoitTableFooter },
   name: "RoitTable",
+  data: () => {
+    return {
+      loading: true,
+    };
+  },
   computed: {
     ...mapGetters({
       currentPage: "getCurrentPage",
@@ -61,20 +67,15 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["setUsers"]),
-    async fetchUsers() {
-      const api = `${process.env.VUE_APP_API}`;
-      const response = await fetch(api);
-      const data = await response.json();
-      return data;
-    },
+    ...mapActions(["setUsers", "fetchUsers"]),
+
     getFullAddress: ({ street, city, uf, others_cep }) =>
       `${street} - ${others_cep} - ${city}/${uf}`,
   },
 
   async mounted() {
-    const users = await this.fetchUsers();
-    this.setUsers(users);
+    await this.fetchUsers();
+    this.loading = false;
   },
 };
 </script>

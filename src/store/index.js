@@ -22,6 +22,12 @@ export default new Vuex.Store({
     setCurrentPage: ({ commit }, payload) => commit("setCurrentPage", payload),
     setPageSize: ({ commit }, payload) => commit("setPageSize", payload),
     setUsers: ({ commit }, payload) => commit("setUsers", payload),
+    fetchUsers: async ({ commit }) => {
+      const api = `${process.env.VUE_APP_API}`;
+      const response = await fetch(api);
+      const data = await response.json();
+      commit("setUsers", data);
+    },
   },
   getters: {
     getOpenDrawer: (state) => state.openDrawer,

@@ -212,7 +212,7 @@ export default {
   name: "AddUser",
   data: () => {
     return {
-      dialog: true,
+      dialog: false,
       valid: false,
       states: ["BA", "SP"],
       cities: ["Salvador", "São Paulo"],
@@ -238,13 +238,11 @@ export default {
       const body = { ...this.userData };
       delete body.id;
 
-      const create = await fetch(api, {
+      await fetch(api, {
         method: "POST",
         body: JSON.stringify(body),
         headers: { "Content-type": "application/json; charset=UTF-8" },
       });
-
-      console.log(create);
     },
     async checkCep(cep) {
       if (cep.match(/\d{8}/)) {
@@ -259,7 +257,6 @@ export default {
         } else {
           this.cepIsValid = true;
           const { logradouro, cep, localidade, uf, ibge, bairro } = json;
-          console.log(this, this.userData);
           this.userData.update({
             logradouro,
             cep,
@@ -309,7 +306,6 @@ export default {
     },
     refreshData() {
       this.userData = new UserData({ id: uuidv4() });
-      
     },
   },
   computed: {
