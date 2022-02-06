@@ -1,6 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
+import Snackbar from "../models/Snackbar";
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -12,6 +14,7 @@ export default new Vuex.Store({
     users: [],
     handleUserOpen: false,
     selectedUser: {},
+    snackbar: {},
   },
   mutations: {
     setOpenDrawer: (state, payload) => (state.openDrawer = payload),
@@ -20,6 +23,7 @@ export default new Vuex.Store({
     setUsers: (state, payload) => (state.users = payload),
     setHandleUserOpen: (state, payload) => (state.handleUserOpen = payload),
     setSelectedUser: (state, payload) => (state.selectedUser = payload),
+    setSnackbar: (state, payload) => (state.snackbar = new Snackbar(payload)),
   },
   actions: {
     setOpenDrawer: ({ commit }, payload) => commit("setOpenDrawer", payload),
@@ -37,6 +41,8 @@ export default new Vuex.Store({
 
     setSelectedUser: ({ commit }, payload) =>
       commit("setSelectedUser", payload),
+
+    setSnackbar: ({ commit }, payload) => commit("setSnackbar", payload),
   },
   getters: {
     getOpenDrawer: (state) => state.openDrawer,
@@ -48,6 +54,7 @@ export default new Vuex.Store({
     getHandleUserOpen: (state) => state.handleUserOpen,
     getSelectedUser: (state) => state.selectedUser,
     hasSelectedUser: (state) => Object.keys(state.selectedUser).length > 0,
+    getSnackbar: (state) => state.snackbar,
   },
   modules: {},
 });

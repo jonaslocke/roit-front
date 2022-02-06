@@ -5,14 +5,16 @@
     <v-main>
       <router-view />
     </v-main>
+    <roit-snackbar />
   </v-app>
 </template>
 
 <script>
 import Navbar from "./components/Navbar/index.vue";
+import RoitSnackbar from "./components/RoitSnackbar.vue";
 
 export default {
-  components: { Navbar },
+  components: { Navbar, RoitSnackbar },
 
   name: "App",
 
