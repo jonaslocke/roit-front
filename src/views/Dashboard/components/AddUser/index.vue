@@ -235,31 +235,13 @@ export default {
   methods: {
     async addUser() {
       const api = `${process.env.VUE_APP_API}`;
-      const body = {
-        name: "antunes",
-        age: "37",
+      const body = { ...this.userData };
+      delete body.id;
 
-        street: "barros pimentel",
-        cep: "41740-210",
-        city: "salvador",
-        uf: "bahia",
-        ibge_code: "00000",
-        others_cep: "",
-
-        git_hub: "https://github.com/jonaslocke",
-        login: "",
-        id: "11",
-        avatar: "",
-        repos: "",
-        others_git: "",
-      };
       const create = await fetch(api, {
         method: "POST",
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers": "*",
-        },
         body: JSON.stringify(body),
+        headers: { "Content-type": "application/json; charset=UTF-8" },
       });
 
       console.log(create);
@@ -285,7 +267,7 @@ export default {
             uf,
             ibge,
             bairro,
-            outrosCep: json,
+            outrosCep: JSON.stringify(json),
           });
           this.loading.cep = false;
         }
@@ -301,7 +283,7 @@ export default {
       if (status === 200) {
         const data = await response.json();
         const { login, avatar_url, html_url, name } = data;
-        const gitId = data.id;
+        const gitId = data.id.toString();
 
         this.userData.update({
           login,
@@ -309,12 +291,13 @@ export default {
           html_url,
           gitId,
           name,
-          othersGit: data,
+          othersGit: JSON.stringify(data),
         });
 
         const fetchRepos = await fetch(`${api}/repos`);
         if (fetchRepos.status === 200) {
-          const repos = await fetchRepos.json();
+          const fetchReposData = await fetchRepos.json();
+          const repos = JSON.stringify(fetchReposData);
           this.userData.update({ repos });
         }
 
@@ -323,6 +306,10 @@ export default {
       } else {
         console.error("not found");
       }
+    },
+    refreshData() {
+      this.userData = new UserData({ id: uuidv4() });
+      
     },
   },
   computed: {
